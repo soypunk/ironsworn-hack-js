@@ -43,12 +43,18 @@ let ROLES = [
 
 let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","Heal","MakeCamp","ReachYourDestination","Resupply","SecureAnAdvantage","UndertakeAJourney"];
 let RELATIONSHIP_MOVE_CLASSES = [];
+let COMBAT_MOVE_CLASSES = ["EnterTheFray","Strike","Clash","TurnTheTide","EndTheFight","Battle"];
+let SUFFER_MOVE_CLASSES = ["EndureHarm","FaceDeath","CompanionEndureHarm","EndureStress","FaceDesolation","OutOfSupply","FaceASetback"];
+let QUEST_MOVE_CLASSES = ["SwearAnIronVow","ReachAMilestone","FulfillYourVow","ForsakeYourVow","Advance"];
 let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
 let MOVES = ADVENTURE_MOVE_CLASSES.concat(
     RELATIONSHIP_MOVE_CLASSES.concat(
-    FATE_MOVE_CLASSES));
+    COMBAT_MOVE_CLASSES.concat(
+    SUFFER_MOVE_CLASSES.concat(
+    QUEST_MOVE_CLASSES.concat(
+    FATE_MOVE_CLASSES))))).sort();
 
-let ORACLES = ["OracleActionTheme", "OracleAction", "OracleTheme", "OraclePlotTwist", "PayThePriceTable"];
+let ORACLES = ["OracleActionTheme", "OracleAction", "OracleTheme", "OraclePlotTwist", "PayThePriceTable"].sort();
 
 /* utils */
 
