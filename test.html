@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8">
+  <title>IS Testing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+  <script type="text/javascript" src='./ironsworn-hack.js'></script>
+  <body class="sans-serif">
+
+    <h1>Testing</h1>
+    
+    <section class="pa3 mb3">
+      <header><h1>Moves</h1></header>
+      
+      <section class="ba pa3">
+        <h2 id="moveTitle"></h2>
+        <p id="moveTrigger"></p>
+        <p id="moveDoThis"></p>
+        <p id="moveResult"></p>
+      </section>
+      
+      <p><strong>Oracle Action + Theme:</strong> <span id="oraA_T"></span></p>
+    </section>
+    
+  </body>
+  <script type="text/javascript">
+    let oraA = new OracleAction();
+    let oraT = new OracleTheme();
+
+    $oraA_T = document.getElementById("oraA_T");
+    $oraA_T.textContent = `${oraA.execute().resultAsSentence} ${oraT.execute().resultAsSentence}`;
+    
+    $moveTitle = document.getElementById("moveTitle");
+    $moveTrigger = document.getElementById("moveTrigger");
+    $moveDoThis = document.getElementById("moveDoThis");
+    $moveResult = document.getElementById("moveResult");
+    let move = new PayThePriceMove();
+    $moveTitle.textContent = move.title;
+    $moveTrigger.textContent = move.trigger;
+    $moveDoThis.innerHTML = move.doThisHTML;
+    move.execute();
+    $moveResult.textContent = move.resultText;
+  </script>
+</html>
