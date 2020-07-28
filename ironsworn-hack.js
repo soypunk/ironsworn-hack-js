@@ -35,7 +35,7 @@ let ROLES = [
 ];
 
 let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove"];
-let FATE_MOVE_CLASSES = ["AskTheOracleMove,PayThePriceMove"];
+let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
 let MOVES = ADVENTURE_MOVE_CLASSES.concat(FATE_MOVE_CLASSES);
 
 let ORACLES = ["OracleAction", "OracleTheme", "OraclePlotTwist"];
@@ -378,13 +378,7 @@ class AskTheOracleMove extends Move {
     set answer(answer_text) {
         this._answer = answer_text;
     }
-    
-    get resultText() {
-        let match_text = "";
-        if (this.match) { match_text = "!!"; }
-        return `(${this.odds.label}) ${this._answer}${match_text}`;
-    }
-    
+        
     execute() {
         let oracle_die = rollD100();
         let oracle_die_array = numberToArray(oracle_die);
@@ -399,6 +393,10 @@ class AskTheOracleMove extends Move {
         } else {
             this.answer = "No"        
         }
+        
+        let match_text = "";
+        if (this.match) { match_text = "!!"; }
+        this.resultText = `(${this.odds.label}) ${this._answer}${match_text}`;
         
         return this;
     }
@@ -446,4 +444,10 @@ class FaceDangerMove extends BasicMove {
         this.miss = "On a miss, you fail, or your progress is undermined by a dramaticand costly turn of events. Pay the Price.";
         this.applicable_stats = ["Edge","Heart","Iron","Shadow","Wits"];
     }
+}
+
+var IS = {
+    "AskTheOracleMove": AskTheOracleMove,
+    "FaceDangerMove": FaceDangerMove,
+    "PayThePriceMove": PayThePriceMove    
 }

@@ -5,18 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
   <script type="text/javascript" src='./ironsworn-hack.js'></script>
-  <body class="sans-serif bg-black gray">
+  <body class="sans-serif pa2 bg-black gray">    
 
-    <h1>Testing</h1>
-    
-    <section class="pa3 mb3">
-      <header><h1>Moves</h1></header>
-      
-      <section class="ba pa3">
-        <h2 id="moveTitle"></h2>
+    <section>
+      <form id="movesPicker">
+        <select id="moves"></select>
+      </form>
+    </section>
+
+    <section class="ba pa3 mb3">
+      <header><h2 id="moveTitle"></h2></header>      
+      <section class="">
         <p id="moveTrigger"></p>
         <p id="moveDoThis"></p>
         <p id="moveResult"></p>
+        <button id="moveGoButton" class="dn">Go</buttom>
       </section>
       
       <p><strong>Oracle Action + Theme:</strong> <span id="oraA_T"></span></p>
@@ -24,21 +27,75 @@
     
   </body>
   <script type="text/javascript">
-    let oraA = new OracleAction();
-    let oraT = new OracleTheme();
+    function ready(fn) {
+      if (document.readyState != 'loading'){
+        fn()
+      } else {
+        document.addEventListener('DOMContentLoaded', fn)
+      }
+    }
 
-    $oraA_T = document.getElementById("oraA_T");
-    $oraA_T.textContent = `${oraA.execute().resultAsSentence} ${oraT.execute().resultAsSentence}`;
+    ready(function(){
     
-    $moveTitle = document.getElementById("moveTitle");
-    $moveTrigger = document.getElementById("moveTrigger");
-    $moveDoThis = document.getElementById("moveDoThis");
-    $moveResult = document.getElementById("moveResult");
-    let move = new FaceDangerMove();
-    $moveTitle.textContent = move.title;
-    $moveTrigger.textContent = move.trigger;
-    $moveDoThis.innerHTML = move.doThisHTML;
-    move.execute();
-    $moveResult.innerHTML = move.resultTextHTML;
+      let getMoveResult = function(move) {
+            $moveResult = document.getElementById("moveResult");
+            $moveResult.innerHTML = "";
+            move.execute();
+            $moveResult.innerHTML = move.resultTextHTML;
+      }
+    
+      let updateMoveBox = function(moveClass) {            
+            var move = new IS[moveClass]();
+            $moveTitle = document.getElementById("moveTitle");
+            $moveTrigger = document.getElementById("moveTrigger");
+            $moveDoThis = document.getElementById("moveDoThis");            
+            $moveGoButton = document.getElementById("moveGoButton");
+            $moveGoButton.classList.remove("dn");
+            
+            $moveTitle.textContent = move.title;
+            $moveTrigger.textContent = move.trigger;
+            $moveDoThis.innerHTML = move.doThisHTML;
+            
+            $moveGoButton.addEventListener('click', function() {                
+                getMoveResult(move);
+            });
+      }
+    
+      $moves = document.getElementById("moves");
+      let moveFragment = document.createDocumentFragment();
+
+      MOVES.forEach(function(move, index) {
+          let opt = document.createElement('option');
+          opt.innerHTML = move;
+          opt.value = move;
+          moveFragment.appendChild(opt);
+      });
+
+      $moves.appendChild(moveFragment);
+      
+      $moves.addEventListener('change', (e) => {
+            let t = e.target;            
+            updateMoveBox(t.value);
+      });
+      
+      /*
+      let oraA = new OracleAction();
+      let oraT = new OracleTheme();
+
+      $oraA_T = document.getElementById("oraA_T");
+      $oraA_T.textContent = `${oraA.execute().resultAsSentence} ${oraT.execute().resultAsSentence}`;
+      
+      
+      $moveTrigger = document.getElementById("moveTrigger");
+      $moveDoThis = document.getElementById("moveDoThis");
+      $moveResult = document.getElementById("moveResult");
+      let move = new FaceDangerMove();
+      $moveTitle.textContent = move.title;
+      $moveTrigger.textContent = move.trigger;
+      $moveDoThis.innerHTML = move.doThisHTML;
+      move.execute();
+      $moveResult.innerHTML = move.resultTextHTML;
+      */
+    });
   </script>
 </html>
