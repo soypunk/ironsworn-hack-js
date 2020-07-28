@@ -34,7 +34,7 @@ let ROLES = [
     "Squad Leader"
 ];
 
-let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","SecureAnAdvantage"];
+let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","SecureAnAdvantage"];
 let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
 let MOVES = ADVENTURE_MOVE_CLASSES.concat(FATE_MOVE_CLASSES);
 
@@ -344,6 +344,7 @@ class BasicMove extends Move {
         super();
         this.applicable_stats = [];
         this.use_role = false;
+        this.use_bond = false;
         this.strong_hit = "";
         this.weak_hit = "";
         this.miss = "";
@@ -507,9 +508,24 @@ class SecureAnAdvantage extends BasicMove  {
     }
 }
 
+class GatherInformation extends BasicMove  {
+    constructor() {
+        super();
+        this.title = "Gather Information";
+        this.trigger = "When you search an area, ask questions, conduct an investigation, or follow a track, roll +wits. If you act within a community or ask questions of a person with whom you share a bond, add +1.";
+        this._do_this = "";
+        this.applicable_stats = ["Wits"];
+        this.use_bond = true;
+        this.strong_hit = "On a strong hit, you discover something helpful and specific. The path you must follow or action you must take to make progress is made clear. Envision what you learn (Ask the Oracle if unsure), and take +2 momentum.";
+        this.weak_hit = "On a weak hit, the information complicates your quest or introduces a new danger. Envision what you discover (Ask the Oracle if unsure), and take +1 momentum.";
+        this.miss = "On a miss, your investigation unearths a dire threat or reveals an unwelcome truth that undermines your quest. Pay the Price";
+    }
+}
+
 var IS = {
     "AskTheOracleMove": AskTheOracleMove,
     "FaceDangerMove": FaceDangerMove,
+    "GatherInformation": GatherInformation,
     "PayThePriceMove": PayThePriceMove,
     "SecureAnAdvantage": SecureAnAdvantage,
     "PayThePriceTable": PayThePriceTable,
