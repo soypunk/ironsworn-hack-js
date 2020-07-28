@@ -6,6 +6,13 @@ let STATS = [
     "Wits"
 ];
 
+let STATUSES = [
+    "Health",
+    "Spirit",
+    "Supply",
+    "Momentum"
+];
+
 /*
     "Brave",
     "Cool",
@@ -34,9 +41,12 @@ let ROLES = [
     "Squad Leader"
 ];
 
-let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","Heal","Resupply","SecureAnAdvantage"];
+let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","Heal","MakeCamp","ReachYourDestination","Resupply","SecureAnAdvantage","UndertakeAJourney"];
+let RELATIONSHIP_MOVE_CLASSES = [];
 let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
-let MOVES = ADVENTURE_MOVE_CLASSES.concat(FATE_MOVE_CLASSES);
+let MOVES = ADVENTURE_MOVE_CLASSES.concat(
+    RELATIONSHIP_MOVE_CLASSES.concat(
+    FATE_MOVE_CLASSES));
 
 let ORACLES = ["OracleActionTheme", "OracleAction", "OracleTheme", "OraclePlotTwist", "PayThePriceTable"];
 
@@ -311,6 +321,7 @@ class Move {
         this.trigger = "";
         this._do_this = "";
         this._resultText = "";
+        this.progress_move = false;
     }
     
     get doThis() {
@@ -343,6 +354,7 @@ class BasicMove extends Move {
     constructor() {
         super();
         this.applicable_stats = [];
+        this.applicable_statuses = [];
         this.use_role = false;
         this.use_bond = false;
         this.strong_hit = "";
@@ -352,7 +364,11 @@ class BasicMove extends Move {
     
     execute(mod=0) {
         let action_die = rollD6();
-        action_die += mod;
+        if (this.progress_move == true) {
+            action_die = mod;
+        } else {
+            action_die += mod;                        
+        }
         let challenge_dice = [rollD10(),rollD10()];
         
         let match_text = "";
@@ -548,14 +564,84 @@ class Resupply extends BasicMove  {
     }
 }
 
+class MakeCamp extends BasicMove  {
+    constructor() {
+        super();
+        
+        let extra_text = [
+            "• Recuperate: Take +1 health for you and any companions.",
+            "• Partake: Suffer -1 supply and take +1 health for you and any companions.",
+            "• Relax: Take +1 spirit.",
+            "• Focus: Take +1 momentum.",
+            "• Prepare: When you break camp, add +1 if you Undertake a Journey."
+        ];
+        
+        this.title = "Resupply";
+        this.trigger = "When you rest and recover for several hours in the wild, roll +supply";
+        this._do_this = "";
+        this.applicable_stats = [];
+        this.applicable_statuses = ["Supply"];
+        this.strong_hit = [
+            "On a strong hit, you and your allies may each choose two."].concat(extra_text).join("\n");
+        this.weak_hit = [
+            "On a weak hit, choose one."].concat(extra_text).join("\n");
+        this.miss = "On a miss, you take no comfort. Pay the Price";
+
+    }
+}
+
+class UndertakeAJourney extends BasicMove  {
+    constructor() {
+        super();
+        this.title = "Undertake a Journey";
+        this.trigger = "When you travel across hazardous or unfamiliar lands, first set the rank of your journey.";
+        this._do_this = [
+            "• Troublesome journey: 3 progress per waypoint.",
+            "• Dangerous journey: 2 progress per waypoint.",
+            "• Formidable journey: 1 progress per waypoint.",
+            "• Extreme journey: 2 ticks per waypoint.",
+            "• Epic journey: 1 tick per waypoint.",
+            "Then, for each segment of your journey, roll +wits. If you are setting off from a community with which you share a bond, add +1 to your initial roll"
+        ].join("\n");
+        this.applicable_stats = ["Wits"];
+        this.use_bond = true;        
+        this.strong_hit = [
+            "On a strong hit, you reach a waypoint. If the waypoint is unknown to you, envision it (Ask the Oracle if unsure). Then, choose one.",
+            "• You make good use of your resources: Mark progress.",
+            "• You move at speed: Mark progress and take +1 momentum, but suffer -1 supply"
+                ].join("\n");
+        this.weak_hit = "On a weak hit, you reach a waypoint and mark progress, but suffer -1 supply.";
+        this.miss = "On a miss, you are waylaid by a perilous event. Pay the Price.";
+    }
+}
+
+class ReachYourDestination extends BasicMove  {
+    constructor() {
+        super();
+        this.title = "Reach Your Destination";
+        this.trigger = "When your journey comes to an end, roll the challenge dice and compare to your progress. Momentum is ignored on this roll.";
+        this._do_this = "";
+        this.progress_move = true;
+        this.strong_hit = [
+            "On a strong hit, the situation at your destination favors you. Choose one.",
+            "• Make another move now (not a progress move), and add +1.",
+            "• Take +1 momentum."].join("\n");
+        this.weak_hit = "On a weak hit, you arrive but face an unforeseen hazard or complication. Envision what you find (Ask the Oracle if unsure).";
+        this.miss = "On a miss, you have gone hopelessly astray, your objective is lost to you, or you were misled about your destination. If your journey continues, clear all but one filled progress, and raise the journey’s rank by one (if not already epic).";
+    }
+}
+
 var IS = {
     "AskTheOracleMove": AskTheOracleMove,
     "FaceDangerMove": FaceDangerMove,
     "GatherInformation": GatherInformation,
-    "Heal": Heal,    
+    "Heal": Heal,
+    "MakeCamp": MakeCamp,
     "PayThePriceMove": PayThePriceMove,
+    "ReachYourDestination": ReachYourDestination,
     "Resupply": Resupply,
     "SecureAnAdvantage": SecureAnAdvantage,
+    "UndertakeAJourney": UndertakeAJourney,
     "PayThePriceTable": PayThePriceTable,
     "OracleAction": OracleAction,
     "OracleTheme": OracleTheme,
