@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
   <script type="text/javascript" src='./ironsworn-hack.js'></script>
-  <body class="sans-serif">
+  <body class="sans-serif bg-black gray">
 
     <h1>Testing</h1>
     
@@ -34,11 +34,11 @@
     $moveTrigger = document.getElementById("moveTrigger");
     $moveDoThis = document.getElementById("moveDoThis");
     $moveResult = document.getElementById("moveResult");
-    let move = new PayThePriceMove();
+    let move = new FaceDangerMove();
     $moveTitle.textContent = move.title;
     $moveTrigger.textContent = move.trigger;
     $moveDoThis.innerHTML = move.doThisHTML;
     move.execute();
-    $moveResult.textContent = move.resultText;
+    $moveResult.innerHTML = move.resultTextHTML;
   </script>
 </html>

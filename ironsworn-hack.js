@@ -34,6 +34,12 @@ let ROLES = [
     "Squad Leader"
 ];
 
+let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove"];
+let FATE_MOVE_CLASSES = ["AskTheOracleMove,PayThePriceMove"];
+let MOVES = ADVENTURE_MOVE_CLASSES.concat(FATE_MOVE_CLASSES);
+
+let ORACLES = ["OracleAction", "OracleTheme", "OraclePlotTwist"];
+
 /* utils */
 
 function rollDie(sides) {
@@ -183,6 +189,29 @@ class OracleTheme extends RandomTable {
     }
 }
 
+class OraclePlotTwist extends RandomTable {
+    constructor() {
+        super();
+        this.table =["It was all a diversion", "A dark secret is revealed",
+            "A trap is sprung", "An assumption is revealed to be false",
+            "A secret alliance is revealed",
+            "Your actions benefit an enemy",
+            "Someone returns unexpectedly",
+            "A more dangerous foe is revealed",
+            "You and an enemy share a common goal",
+            "A true identity is revealed",
+            "You are betrayed by someone who was trusted",
+            "You are too late", "The true enemy is revealed",
+            "The enemy gains new allies", "A new danger appears",
+            "Someone or something goes missing",
+            "The truth of a relationship is revealed",
+            "Two seemingly unconnected situations are shown to be connected",
+            "Unexpected powers or abilities are revealed",
+            "Roll twice more on this table. Both results occur. If they are"
+            + " the same result, make it more dramatic."];
+    }
+}
+
 class PayThePriceTable extends NearestNumberTable {
     constructor() {
         super(100);
@@ -242,6 +271,7 @@ class Move {
         this.title = "";
         this.trigger = "";
         this._do_this = "";
+        this._resultText = "";
     }
     
     get doThis() {
@@ -250,7 +280,19 @@ class Move {
     }
     
     get doThisHTML() {
-        return this._do_this.replace(/(?:\r\n|\r|\n)/g, '<br>');;
+        return this._do_this.replace(/(?:\r\n|\r|\n)/g, '<br>');
+    }
+    
+    get resultText() {
+        return this._resultText;
+    }
+    
+    set resultText(text) {
+        this._resultText = text;
+    }
+    
+    get resultTextHTML() {
+        return this._resultText.replace(/(?:\r\n|\r|\n)/g, '<br>');    
     }
     
     execute() {
@@ -266,21 +308,33 @@ class BasicMove extends Move {
         this.strong_hit = "";
         this.weak_hit = "";
         this.miss = "";
-        this._resultText = "";
     }
     
-    get resultText() {
-        return this._resultText;
-    }
-    
-    execute() {
+    execute(mod=0) {
         let action_die = rollD6();
-        let challenge_dice = [rollD10(),rollD10()];        
+        action_die += mod;
+        let challenge_dice = [rollD10(),rollD10()];
+        
+        let match_text = "";
+        
+        if (challenge_dice[0] == challenge_dice[1]) {
+            match_text = "!!"
+        }
+        
+        this.resultText = `(${action_die} vs. ${challenge_dice[0]}, ${challenge_dice[1]}${match_text})`;
+        
+        if (action_die > challenge_dice[0] && action_die > challenge_dice[1]) {
+            this.resultText = `${this.resultText} ${this.strong_hit}`;
+        } else if (action_die > challenge_dice[0] || action_die > challenge_dice[1]) {
+            this.resultText = `${this.resultText} ${this.weak_hit}`;
+        } else {
+            this.resultText = `${this.resultText} ${this.miss}`;
+        }
         return this;
     }
 }
 
-class OracleMove extends Move {
+class AskTheOracleMove extends Move {
     constructor(odds = "Likely") {
         super();
         this.title = "Ask the Oracle";
@@ -363,11 +417,33 @@ class PayThePriceMove extends Move {
         this.table.execute();
     }
     
-    get resultText() {
-        return this.table.result;
-    }    
-    
     execute() {
+        this.resultText = this.table.result;
         return this;
-    }    
+    }
+}
+
+class FaceDangerMove extends BasicMove {
+    constructor() {
+        super();
+        this.title = "Face Danger";
+        this.trigger = "When you attempt something risky or react to an imminent threat, envision your action and roll. If you act:";
+        this._do_this = [
+            "• With speed, agility, or precision: Roll +edge.",
+            "• With charm, loyalty, or courage: Roll +heart.",
+            "• With aggressive action, forceful defense, strength, or endurance: Roll +iron.",
+            "• With deception, stealth, or trickery: Roll +shadow.",
+            "• With expertise, insight, or observation: Roll +wits."                    
+        ].join("\n");
+        this.strong_hit = "On a strong hit, you are successful. Take +1 momentum.";
+        this.weak_hit = [
+            "On a weak hit, you succeed, but face a troublesome cost. Choose one.",
+            "• You are delayed, lose advantage, or face a new danger: Suffer -1 momentum.",
+            "• You are tired or hurt: Endure Harm (1 harm).",
+            "• You are dispirited or afraid: Endure Stress (1 stress).",
+            "• You sacrifice resources: Suffer -1 supply."
+        ].join("\n");
+        this.miss = "On a miss, you fail, or your progress is undermined by a dramaticand costly turn of events. Pay the Price.";
+        this.applicable_stats = ["Edge","Heart","Iron","Shadow","Wits"];
+    }
 }
