@@ -34,7 +34,7 @@ let ROLES = [
     "Squad Leader"
 ];
 
-let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove"];
+let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","SecureAnAdvantage"];
 let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
 let MOVES = ADVENTURE_MOVE_CLASSES.concat(FATE_MOVE_CLASSES);
 
@@ -485,10 +485,33 @@ class FaceDangerMove extends BasicMove {
     }
 }
 
+class SecureAnAdvantage extends BasicMove  {
+    constructor() {
+        super();
+        this.title = "Secure an Advantage";
+        this.trigger = "When you assess a situation, make preparations, or attempt to gain leverage, envision your action and roll. If you act:";
+        this._do_this = [
+            "• With speed, agility, or precision: Roll +edge.",
+            "• With charm, loyalty, or courage: Roll +heart.",
+            "• With aggressive action, forceful defense, strength, or endurance: Roll +iron.",
+            "• With deception, stealth, or trickery: Roll +shadow.",
+            "• With expertise, insight, or observation: Roll +wits."        
+        ].join("\n");
+        this.applicable_stats = ["Edge", "Heart", "Iron", "Shadow", "Wits"];
+        this.strong_hit = [
+            "On a strong hit, you gain advantage. Choose one.",
+            "• Take control: Make another move now (not a progress move); when you do, add +1.",
+            "• Prepare to act: Take +2 momentum."].join("\n");
+        this.weak_hit = "On a weak hit, your advantage is short-lived. Take +1 momentum.";
+        this.miss = "On a miss, you fail or your assumptions betray you. Pay the Price";
+    }
+}
+
 var IS = {
     "AskTheOracleMove": AskTheOracleMove,
     "FaceDangerMove": FaceDangerMove,
     "PayThePriceMove": PayThePriceMove,
+    "SecureAnAdvantage": SecureAnAdvantage,
     "PayThePriceTable": PayThePriceTable,
     "OracleAction": OracleAction,
     "OracleTheme": OracleTheme,
