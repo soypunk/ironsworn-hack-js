@@ -7,13 +7,10 @@
   <script type="text/javascript" src='./ironsworn-hack.js'></script>
   <body class="sans-serif pa2 bg-black gray">    
 
-    <section>
+    <section class="ba pa3 mb3">
       <form id="movesPicker">
         <select id="moves"></select>
-      </form>
-    </section>
-
-    <section class="ba pa3 mb3">
+      </form>    
       <header><h2 id="moveTitle"></h2></header>      
       <section class="">
         <p id="moveTrigger"></p>
@@ -21,9 +18,19 @@
         <p id="moveResult"></p>
         <button id="moveGoButton" class="dn">Go</buttom>
       </section>
-      
-      <p><strong>Oracle Action + Theme:</strong> <span id="oraA_T"></span></p>
     </section>
+
+    <section class="ba pa3 mb3">
+      <form id="oraclesPicker">
+        <select id="oracles"></select>
+      </form>    
+      <header><h2 id="oracleTitle"></h2></header>      
+      <section class="">
+        <p id="oracleResult"></p>        
+        <pre id="oracleTableDisplay" class="bt mt3 pt3 sans-serif"></pre>
+      </section>
+    </section>
+
     
   </body>
   <script type="text/javascript">
@@ -37,6 +44,7 @@
 
     ready(function(){
     
+      // MOVES
       let getMoveResult = function(move) {
             $moveResult = document.getElementById("moveResult");
             $moveResult.innerHTML = "";
@@ -44,7 +52,7 @@
             $moveResult.innerHTML = move.resultTextHTML;
       }
     
-      let updateMoveBox = function(moveClass) {            
+      let updateMoveBox = function(moveClass) {
             var move = new IS[moveClass]();
             $moveTitle = document.getElementById("moveTitle");
             $moveTrigger = document.getElementById("moveTrigger");
@@ -76,6 +84,37 @@
       $moves.addEventListener('change', (e) => {
             let t = e.target;            
             updateMoveBox(t.value);
+      });
+      
+      // ORACLES      
+
+      let updateOracleBox = function(oracleClass) {
+            $oracleResult = document.getElementById("oracleResult");      
+            $oracleResult.textContent = "";      
+            var oracle = new IS[oracleClass]();
+            $oracleTitle = document.getElementById("oracleTitle");
+            $oracleTableDisplay = document.getElementById("oracleTableDisplay");
+            $oracleTitle.textContent = oracle.title;
+            $oracleTableDisplay.textContent = oracle.tableDisplay();            
+            oracle.execute();
+            $oracleResult.textContent = oracle.result;
+      }
+
+      $oracles = document.getElementById("oracles");
+      let oracleFragment = document.createDocumentFragment();
+
+      ORACLES.forEach(function(oracle, index) {
+          let opt = document.createElement('option');
+          opt.innerHTML = oracle;
+          opt.value = oracle;
+          oracleFragment.appendChild(opt);
+      });
+
+      $oracles.appendChild(oracleFragment);
+      
+      $oracles.addEventListener('change', (e) => {
+            let t = e.target;            
+            updateOracleBox(t.value);
       });
       
       /*

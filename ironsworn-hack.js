@@ -38,7 +38,7 @@ let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove"];
 let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
 let MOVES = ADVENTURE_MOVE_CLASSES.concat(FATE_MOVE_CLASSES);
 
-let ORACLES = ["OracleAction", "OracleTheme", "OraclePlotTwist"];
+let ORACLES = ["OracleActionTheme", "OracleAction", "OracleTheme", "OraclePlotTwist", "PayThePriceTable"];
 
 /* utils */
 
@@ -107,6 +107,7 @@ function getClosestKey(arr, target, u) {
 
 class RandomTable {
     constructor(num = 1) {
+        this.title = "";
         this.table = [];
         this.num_results = num;
         this.result = "";
@@ -120,10 +121,15 @@ class RandomTable {
         this.result = getRandom(this.table,this.num_results);
         return this;
     }
+    
+    tableDisplay() {
+        return this.table.sort().join("\n");
+    }
 }
 
 class NearestNumberTable {
     constructor(item_range) {
+        this.title = "";    
         this.table = {};
         this.item_range = item_range;
         this.item_number = null;
@@ -140,11 +146,20 @@ class NearestNumberTable {
         this.result = this.table[getClosestKey(this.table ,this.item_number)];
         return this;
     }
+    
+    tableDisplay() {
+        let table = this.table;
+        let values = Object.keys(table).map(function(key){
+            return table[key];
+        });
+        return values.sort().join("\n");
+    }    
 }
 
 class OracleAction extends RandomTable {
     constructor() {
         super();
+        this.title = "Action";        
         this.table = ["Scheme", "Clash", "Weaken", "Initiate", "Create", "Swear",
             "Avenge", "Guard", "Defeat", "Control", "Break", "Risk",
             "Surrender", "Inspect", "Raid", "Evade", "Assualt", "Deflect",
@@ -169,6 +184,7 @@ class OracleAction extends RandomTable {
 class OracleTheme extends RandomTable {
     constructor() {
         super();
+        this.title = "Theme";        
         this.table = ["Risk", "Ability", "Price", "Ally", "Battle", "Safety",
             "Survival", "Weapon", "Wound", "Shelter", "Leader", "Fear",
             "Time", "Duty", "Secret", "Innocence", "Renown", "Direction",
@@ -189,9 +205,31 @@ class OracleTheme extends RandomTable {
     }
 }
 
+class OracleActionTheme {
+    constructor() {
+        this.title = "Action & Theme";    
+        this.result = "";
+        this.table = null;
+    }
+    
+    tableDisplay() {
+        return "";
+    }
+    
+    execute() {
+        let OA = new OracleAction();
+        OA.execute();
+        let OT = new OracleAction();
+        OT.execute();
+        this.result = `${OA.result} ${OT.result}`;        
+        return this;
+    }
+}
+
 class OraclePlotTwist extends RandomTable {
     constructor() {
         super();
+        this.title = "Plot Twist";        
         this.table =["It was all a diversion", "A dark secret is revealed",
             "A trap is sprung", "An assumption is revealed to be false",
             "A secret alliance is revealed",
@@ -215,6 +253,7 @@ class OraclePlotTwist extends RandomTable {
 class PayThePriceTable extends NearestNumberTable {
     constructor() {
         super(100);
+        this.title = "Pay The Price";        
         this.table = {
           "1": "Roll again and apply that result but make it worse",
           "3": "A person or community you trusted loses faith in you or acts against you",
@@ -449,5 +488,10 @@ class FaceDangerMove extends BasicMove {
 var IS = {
     "AskTheOracleMove": AskTheOracleMove,
     "FaceDangerMove": FaceDangerMove,
-    "PayThePriceMove": PayThePriceMove    
+    "PayThePriceMove": PayThePriceMove,
+    "PayThePriceTable": PayThePriceTable,
+    "OracleAction": OracleAction,
+    "OracleTheme": OracleTheme,
+    "OraclePlotTwist": OraclePlotTwist,    
+    "OracleActionTheme": OracleActionTheme
 }
