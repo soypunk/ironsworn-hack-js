@@ -34,7 +34,7 @@ let ROLES = [
     "Squad Leader"
 ];
 
-let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","SecureAnAdvantage"];
+let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","Heal","Resupply","SecureAnAdvantage"];
 let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
 let MOVES = ADVENTURE_MOVE_CLASSES.concat(FATE_MOVE_CLASSES);
 
@@ -522,11 +522,39 @@ class GatherInformation extends BasicMove  {
     }
 }
 
+class Heal extends BasicMove  {
+    constructor() {
+        super();
+        this.title = "Heal";
+        this.trigger = "When you treat an injury or ailment, roll +wits. If you are mending your own wounds, roll +wits or +iron, whichever is lower.";
+        this._do_this = "";
+        this.applicable_stats = ["Iron", "Wits"];
+        this.strong_hit = "On a strong hit, your care is helpful. If you (or the ally under your care) have the wounded condition, you may clear it. Then, take or give up to +2 health.";
+        this.weak_hit = "On a weak hit, as above, but you must suffer -1 supply or -1 momentum (your choice).";
+        this.miss = "On a miss, your aid is ineffective. Pay the Price.";
+    }
+}
+
+class Resupply extends BasicMove  {
+    constructor() {
+        super();
+        this.title = "Resupply";
+        this.trigger = "When you hunt, forage, or scavenge, roll +wits.";
+        this._do_this = "";
+        this.applicable_stats = ["Iron", "Wits"];
+        this.strong_hit = "On a strong hit, you bolster your resources. Take +2 supply.";
+        this.weak_hit = "On a weak hit, take up to +2 supply, but suffer -1 momentum for each.";
+        this.miss = "On a miss, you find nothing helpful. Pay the Price.";
+    }
+}
+
 var IS = {
     "AskTheOracleMove": AskTheOracleMove,
     "FaceDangerMove": FaceDangerMove,
     "GatherInformation": GatherInformation,
+    "Heal": Heal,    
     "PayThePriceMove": PayThePriceMove,
+    "Resupply": Resupply,
     "SecureAnAdvantage": SecureAnAdvantage,
     "PayThePriceTable": PayThePriceTable,
     "OracleAction": OracleAction,

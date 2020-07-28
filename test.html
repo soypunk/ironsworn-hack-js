@@ -53,6 +53,8 @@
       }
     
       let updateMoveBox = function(moveClass) {
+            $moveResult = document.getElementById("moveResult");
+            $moveResult.innerHTML = "";      
             var move = new IS[moveClass]();
             $moveTitle = document.getElementById("moveTitle");
             $moveTrigger = document.getElementById("moveTrigger");
