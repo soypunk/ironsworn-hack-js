@@ -95,17 +95,22 @@ class IS {
             "Solider",
             "Squad Leader"
         ];
-        this.ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","Heal","MakeCamp","ReachYourDestination","Resupply","SecureAnAdvantage","UndertakeAJourney"];
-        this.RELATIONSHIP_MOVE_CLASSES =  ["Compel","Sojourn","DrawTheCircle","ForgeABond","TestYourBond","AidYourAlly","WriteYourEpilogue"];
-        this.COMBAT_MOVE_CLASSES = ["EnterTheFray","Strike","Clash","TurnTheTide","EndTheFight","Battle"];
-        this.QUEST_MOVE_CLASSES = ["SwearAnIronVow","ReachAMilestone","FulfillYourVow","ForsakeYourVow","Advance"];
-        this.SUFFER_MOVE_CLASSES = ["EndureHarm","FaceDeath","CompanionEndureHarm","EndureStress","FaceDesolation","OutOfSupply","FaceASetback"];
-        this.FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];        
+        this.VOW_MOVES_CLASSES = ["SwearAnIronVow","ReachAMilestone","FulfillYourVow","ForsakeYourVow"];
+        this.ADVENTURE_MOVE_CLASSES = ["FaceDanger","SecureAnAdvantage","GatherInformation","Compel","AidYourAlly","MakeCamp"];
+        this.EXPLORATION_MOVES_CLASSES = ["UndertakeAnExpedition","ExploreAWaypoint","MakeADiscovery","ConfrontChaos","FinishYourExpedition","SetACourse"];
+        this.CONNECTION_MOVE_CLASSES =  ["MakeAConnection","DevelopARelationship","ForgeABond","TestYourRelationship"];
+        this.COMBAT_MOVE_CLASSES = ["EnterTheFray","GainGround","ReactUnderFire","Strike","Clash","TurnTheTide","FaceDefeat","TakeDecisiveAction","Battle"];
+        this.LEGACY_MOVE_CLASSES = ["Advance","WriteYourEpilogue"];
+        this.SUFFER_MOVE_CLASSES = ["LoseMomentum","EndureHarm","EndureStress","CompanionTakesAHit"];
+        this.THRESHOLD_MOVE_CLASSES = ["FaceDeath","FaceDesolation","OvercomeDestruction"];
+        this.RECOVER_MOVE_CLASSES = ["Heal","Hearten","Repair","Resupply","Sojourn"];
+        this.FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
+        this.MISC_MOVE_CLASSES = ["DrawTheCircle","EndTheFight","ReachYourDestination","UndertakeAJourney","OutOfSupply","FaceASetback"]; 
         this.ORACLES = ["OracleActionTheme", "OracleAction", "OracleTheme", "OraclePlotTwist", "PayThePriceTable"].sort();
     }
     
     get MOVES() {
-        return this.ADVENTURE_MOVE_CLASSES.concat(this.RELATIONSHIP_MOVE_CLASSES.concat(this.COMBAT_MOVE_CLASSES.concat(this.SUFFER_MOVE_CLASSES.concat(this.QUEST_MOVE_CLASSES.concat(this.FATE_MOVE_CLASSES))))).sort();
+        return this.ADVENTURE_MOVE_CLASSES.concat(this.RELATIONSHIP_MOVE_CLASSES.concat(this.COMBAT_MOVE_CLASSES.concat(this.SUFFER_MOVE_CLASSES.concat(this.QUEST_MOVE_CLASSES.concat(this.THRESHOLD_MOVE_CLASSES.concat(this.RECOVER_MOVE_CLASSES.concat(this.FATE_MOVE_CLASSES))))))).sort();
     }
 }
 
@@ -477,7 +482,7 @@ class PayThePriceMove extends Move {
 
 /* ADVENTURE MOVES */
 
-class FaceDangerMove extends BasicMove {
+class FaceDanger extends BasicMove {
     constructor() {
         super();
         this.title = "Face Danger";
@@ -491,13 +496,14 @@ class FaceDangerMove extends BasicMove {
         ].join("\n");
         this.strong_hit = "On a strong hit, you are successful. Take +1 momentum.";
         this.weak_hit = [
-            "On a weak hit, you succeed, but face a troublesome cost. Choose one.",
-            "• You are delayed, lose advantage, or face a new danger: Suffer -1 momentum.",
-            "• You are tired or hurt: Endure Harm (1 harm).",
-            "• You are dispirited or afraid: Endure Stress (1 stress).",
-            "• You sacrifice resources: Suffer -1 supply."
-        ].join("\n");
-        this.miss = "On a miss, you fail, or your progress is undermined by a dramaticand costly turn of events. Pay the Price.";
+            "On a weak hit, you succeed, but at a troublesome cost. Make a suffer move (-1).",
+            "• Delayed, Disadvanted: Lose Momentum",
+            "• Physical injury/strain: Endure Harm",
+            "• Mental shock/despair: Endure Stress",
+            "• Vehicles: Withstand Damage",
+            "• Companion Takes A Hit",
+            "• Sacrifice Resources"].join("\n");
+        this.miss = "On a miss, you fail, or a momentary success is undermined by a costly turn of events. Pay the Price";
         this.applicable_stats = ["Edge","Heart","Iron","Shadow","Wits"];
     }
 }
@@ -515,11 +521,14 @@ class SecureAnAdvantage extends BasicMove  {
             "• With expertise, insight, or observation: Roll +wits."        
         ].join("\n");
         this.applicable_stats = ["Edge", "Heart", "Iron", "Shadow", "Wits"];
-        this.strong_hit = [
-            "On a strong hit, you gain advantage. Choose one.",
-            "• Take control: Make another move now (not a progress move); when you do, add +1.",
-            "• Prepare to act: Take +2 momentum."].join("\n");
-        this.weak_hit = "On a weak hit, your advantage is short-lived. Take +1 momentum.";
+        
+        let extra_text = [
+            "• Take +2 momentum.",
+            "• Make another move now (not a progress move), and add +1."
+            ];
+        
+        this.strong_hit = ["On a strong hit, take both"].concat(extra_text).join("\n");
+        this.weak_hit = ["On a weak hit, take one"].concat(extra_text).join("\n");
         this.miss = "On a miss, you fail or your assumptions betray you. Pay the Price";
     }
 }
@@ -531,7 +540,6 @@ class GatherInformation extends BasicMove  {
         this.trigger = "When you search an area, ask questions, conduct an investigation, or follow a track, roll +wits. If you act within a community or ask questions of a person with whom you share a bond, add +1.";
         this._do_this = "";
         this.applicable_stats = ["Wits"];
-        this.use_bond = true;
         this.strong_hit = "On a strong hit, you discover something helpful and specific. The path you must follow or action you must take to make progress is made clear. Envision what you learn (Ask the Oracle if unsure), and take +2 momentum.";
         this.weak_hit = "On a weak hit, the information complicates your quest or introduces a new danger. Envision what you discover (Ask the Oracle if unsure), and take +1 momentum.";
         this.miss = "On a miss, your investigation unearths a dire threat or reveals an unwelcome truth that undermines your quest. Pay the Price";
@@ -636,7 +644,7 @@ class ReachYourDestination extends BasicMove  {
 class Compel extends BasicMove  {
     constructor() {
         super();
-        this.title = "Compel";    
+        this.title = "Compel"; 
         this.trigger = "When you attempt to persuade someone to do something, envision your approach and roll. If you";
         this.use_bond = true;
         this._do_this = [
@@ -654,22 +662,25 @@ class Compel extends BasicMove  {
 class Sojourn extends BasicMove {
     constructor() {
         super();
+        this.title = "Sojourn";
     }
 }
 
 class DrawTheCircle extends BasicMove {
     constructor() {
         super();
+        this.title = "Draw The Circle";
     }
 }
 
 class ForgeABond extends BasicMove {
     constructor() {
         super();
+        this.title = "Forge a Bond";
     }
 }
 
-class TestYourBond extends BasicMove {
+class TestYourRelationship extends BasicMove {
     constructor() {
         super();
     }
@@ -733,12 +744,6 @@ class EndureHarm extends BasicMove {
     }
 }
 
-class FaceDeath extends BasicMove {
-    constructor() {
-        super();
-    }
-}
-
 class CompanionEndureHarm extends BasicMove {
     constructor() {
         super();
@@ -746,12 +751,6 @@ class CompanionEndureHarm extends BasicMove {
 }
 
 class EndureStress extends BasicMove {
-    constructor() {
-        super();
-    }
-}
-
-class FaceDesolation extends BasicMove {
     constructor() {
         super();
     }
@@ -784,27 +783,46 @@ class ReachAMilestone extends BasicMove {
 class FulfillYourVow extends BasicMove {
     constructor() {
         super();
+        this.title = "Fulfill Your Vow";
     }
 }
 class ForsakeYourVow extends BasicMove {
     constructor() {
         super();
+        this.title = "Forsake Your Vow";
     }
 }
 class Advance extends BasicMove {
     constructor() {
         super();
+        this.title = "Advance";
     }
 }
+
+/* THRESHOLD MOVES */
+
+class FaceDeath extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class FaceDesolation extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+/* RECOVER MOVES */
 
 export { 
     Utils,IS,
     Advance,AidYourAlly,AskTheOracleMove,
-    Battle,Clash,CompanionEndureHarm,Compel,
+    Battle,Clash,CompanionTakesAHit,Compel,
     DrawTheCircle,EndTheFight,EndureHarm,EndureStress,EnterTheFray,
-    FaceASetback,FaceDangerMove,FaceDeath,FaceDesolation,ForgeABond,
-    ForsakeYourVow,FulfillYourVow,GatherInformation,Heal,MakeCamp,
+    FaceASetback,FaceDanger,FaceDeath,FaceDesolation,ForgeABond,
+    ForsakeYourVow,FulfillYourVow,GatherInformation,Heal,Hearten,MakeCamp,
     OutOfSupply,PayThePriceMove,ReachAMilestone,ReachYourDestination,
-    Resupply,SecureAnAdvantage,Sojourn,Strike,SwearAnIronVow,TestYourBond,
+    Resupply,SecureAnAdvantage,Sojourn,Strike,SwearAnIronVow,TestYourRelationship,
     TurnTheTide,UndertakeAJourney,WriteYourEpilogue,
     OracleAction,OracleActionTheme,OraclePlotTwist,OracleTheme,PayThePriceTable }
