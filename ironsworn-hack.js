@@ -1,17 +1,56 @@
-let STATS = [
-    "Edge",
-    "Iron",
-    "Heart",
-    "Shadow",
-    "Wits"
-];
+/* utils */
+class Utils {
+    constructor() {}
+    rollDie(sides) {
+        return Math.floor((Math.random() * sides) + 1);
+    }
+    rollD6() { return this.rollDie(6); }
+    rollD10() { return this.rollDie(10); }
+    rollD100() { return this.rollDie(100); }
+    arrayToSentence(arr) {
+        	if (arr.length == 1) {
+        		return arr[0];
+        	} else {
+            let last = arr.pop();
+        		return arr.join(', ') + ' and ' + last;
+        	}
+    }
+    numberToArray(n) {
+        return Array.from(String(n), Number);
+        // return Array.from(n.toString()).map(Number);
+    }
+    getRandom(arr, n=1) {
+        let result = new Array(n);
+        let len = arr.length;
+        let taken = new Array(len);
+        if (n > len) {
+            throw new RangeError("getRandom: more elements taken than available");
+        }
+        while (n--) {
+            let x = Math.floor(Math.random() * len);
+            result[n] = arr[x in taken ? taken[x] : x];
+            taken[x] = --len in taken ? taken[len] : len;
+        }
+        return result
+    }
+    getClosestKey(arr, target, u) {
+        if (arr.hasOwnProperty(target)) {
+            return target;
+        }
+        let keys = Object.keys(arr);
+        keys.sort(function(a,b){ return a-b; });
 
-let STATUSES = [
-    "Health",
-    "Spirit",
-    "Supply",
-    "Momentum"
-];
+        for(var i = 0, prev; i < keys.length; i++){
+            if (Number(keys[i]) > target) {
+                return prev === u ? u : +prev;
+            }
+            prev = keys[i];
+        }
+        return +keys[i - 1];
+    }
+}
+
+const u = new Utils();
 
 /*
     "Brave",
@@ -22,101 +61,52 @@ let STATUSES = [
     "Quick"
 */
 
-let ROLES = [
-    "Bounty Hunter",
-    "Diplomat",
-    "Entertainer",
-    "Jedi Knight",    
-    "Jedi Padawan",
-    "Medic",
-    "Merchant",
-    "Noble",
-    "Pilot",    
-    "Pirate",    
-    "Officer",
-    "Scout",
-    "Slicer",
-    "Smuggler",
-    "Solider",
-    "Squad Leader"
-];
-
-let ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","Heal","MakeCamp","ReachYourDestination","Resupply","SecureAnAdvantage","UndertakeAJourney"];
-let RELATIONSHIP_MOVE_CLASSES = [];
-let COMBAT_MOVE_CLASSES = ["EnterTheFray","Strike","Clash","TurnTheTide","EndTheFight","Battle"];
-let SUFFER_MOVE_CLASSES = ["EndureHarm","FaceDeath","CompanionEndureHarm","EndureStress","FaceDesolation","OutOfSupply","FaceASetback"];
-let QUEST_MOVE_CLASSES = ["SwearAnIronVow","ReachAMilestone","FulfillYourVow","ForsakeYourVow","Advance"];
-let FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];
-let MOVES = ADVENTURE_MOVE_CLASSES.concat(
-    RELATIONSHIP_MOVE_CLASSES.concat(
-    COMBAT_MOVE_CLASSES.concat(
-    SUFFER_MOVE_CLASSES.concat(
-    QUEST_MOVE_CLASSES.concat(
-    FATE_MOVE_CLASSES))))).sort();
-
-let ORACLES = ["OracleActionTheme", "OracleAction", "OracleTheme", "OraclePlotTwist", "PayThePriceTable"].sort();
-
-/* utils */
-
-function rollDie(sides) {
-    return Math.floor((Math.random() * sides) + 1);
-}
-
-function rollD6() {
-    return rollDie(6);
-}
-
-function rollD10() {
-    return rollDie(10);
-}
-
-function rollD100() {
-    return rollDie(100);
-}
-
-function arrayToSentence(arr) {
-	if (arr.length == 1) {
-		return arr[0];
-	} else {
-        let last = arr.pop();
-    		return arr.join(', ') + ' and ' + last;
-    	}
-}
-
-function numberToArray(n) {
-    return Array.from(String(n), Number);
-    // return Array.from(n.toString()).map(Number);
-}
-
-function getRandom(arr, n=1) {
-    let result = new Array(n);
-    let len = arr.length;
-    let taken = new Array(len);
-    if (n > len) {
-        throw new RangeError("getRandom: more elements taken than available");
+/* IS */
+class IS {
+    constructor() {
+        this.STATS = [
+            "Edge",
+            "Iron",
+            "Heart",
+            "Shadow",
+            "Wits"
+        ];
+        this.STATUSES = [
+            "Health",
+            "Spirit",
+            "Supply",
+            "Momentum"
+        ];
+        this.ROLES = [
+            "Bounty Hunter",
+            "Diplomat",
+            "Entertainer",
+            "Jedi Knight",    
+            "Jedi Padawan",
+            "Medic",
+            "Merchant",
+            "Noble",
+            "Pilot",    
+            "Pirate",    
+            "Officer",
+            "Scout",
+            "Slicer",
+            "Smuggler",
+            "Solider",
+            "Squad Leader"
+        ];
+        this.ADVENTURE_MOVE_CLASSES = ["FaceDangerMove","GatherInformation","Heal","MakeCamp","ReachYourDestination","Resupply","SecureAnAdvantage","UndertakeAJourney"];
+        this.RELATIONSHIP_MOVE_CLASSES =  ["Compel","Sojourn","DrawTheCircle","ForgeABond","TestYourBond","AidYourAlly","WriteYourEpilogue"];
+        this.COMBAT_MOVE_CLASSES = ["EnterTheFray","Strike","Clash","TurnTheTide","EndTheFight","Battle"];
+        this.QUEST_MOVE_CLASSES = ["SwearAnIronVow","ReachAMilestone","FulfillYourVow","ForsakeYourVow","Advance"];
+        this.SUFFER_MOVE_CLASSES = ["EndureHarm","FaceDeath","CompanionEndureHarm","EndureStress","FaceDesolation","OutOfSupply","FaceASetback"];
+        this.FATE_MOVE_CLASSES = ["AskTheOracleMove","PayThePriceMove"];        
+        this.ORACLES = ["OracleActionTheme", "OracleAction", "OracleTheme", "OraclePlotTwist", "PayThePriceTable"].sort();
     }
-    while (n--) {
-        let x = Math.floor(Math.random() * len);
-        result[n] = arr[x in taken ? taken[x] : x];
-        taken[x] = --len in taken ? taken[len] : len;
-    }
-    return result
-}
     
-function getClosestKey(arr, target, u) {
-    if (arr.hasOwnProperty(target)) {
-        return target;
+    get MOVES() {
+        return this.ADVENTURE_MOVE_CLASSES.concat(this.RELATIONSHIP_MOVE_CLASSES.concat(this.COMBAT_MOVE_CLASSES.concat(this.SUFFER_MOVE_CLASSES.concat(this.QUEST_MOVE_CLASSES.concat(this.FATE_MOVE_CLASSES))))).sort();
     }
-    let keys = Object.keys(arr);
-    keys.sort(function(a,b){ return a-b; });
-
-    for(var i = 0, prev; i < keys.length; i++){
-        if (Number(keys[i]) > target) {
-            return prev === u ? u : +prev;
-        }
-        prev = keys[i];
-    }
-    return +keys[i - 1];
 }
 
 /* RANDOM TABLES */
@@ -134,7 +124,7 @@ class RandomTable {
     }
     
     execute() {
-        this.result = getRandom(this.table,this.num_results);
+        this.result = u.getRandom(this.table,this.num_results);
         return this;
     }
     
@@ -154,11 +144,11 @@ class NearestNumberTable {
     }
     
     get resultAsSentence() {
-        return arrayToSentence(this.result)
+        return u.arrayToSentence(this.result)
     }
     
     execute() {
-        this.item_number = rollDie(this.item_range)
+        this.item_number = u.rollDie(this.item_range)
         this.result = this.table[getClosestKey(this.table ,this.item_number)];
         return this;
     }
@@ -291,26 +281,26 @@ class PayThePriceTable extends NearestNumberTable {
     }
     
     execute() {
-        this.item_number = rollDie(this.item_range)
+        this.item_number = u.rollDie(this.item_range)
         
         let itsBad = false;
         
         if (this.item_number <= 2) {
-            this.item_number = rollDie(100);
+            this.item_number = u.rollDie(100);
             itsBad = true;
             if (this.item_number <= 2) {
                 this.item_number = Math.max(3, this.item_number);                
             }
-            this.result = this.table[getClosestKey(this.table ,this.item_number)];            
+            this.result = this.table[u.getClosestKey(this.table ,this.item_number)];            
         } else if (this.item_number >= 99) {
             this.item_number = [Math.max(3,rollDie(98)), Math.max(3,rollDie(98))];
             this.result = [
-                this.table[getClosestKey(this.table ,this.item_number[0])],
-                this.table[getClosestKey(this.table ,this.item_number[1])]
+                this.table[u.getClosestKey(this.table ,this.item_number[0])],
+                this.table[u.getClosestKey(this.table ,this.item_number[1])]
             ];
             this.result = this.resultAsSentence;
         } else {
-            this.result = this.table[getClosestKey(this.table ,this.item_number)];
+            this.result = this.table[u.getClosestKey(this.table ,this.item_number)];
         }
         if (itsBad) {
             this.result = `!! ${this.result} !!`;
@@ -369,13 +359,13 @@ class BasicMove extends Move {
     }
     
     execute(mod=0) {
-        let action_die = rollD6();
+        let action_die = u.rollD6();
         if (this.progress_move == true) {
             action_die = mod;
         } else {
             action_die += mod;                        
         }
-        let challenge_dice = [rollD10(),rollD10()];
+        let challenge_dice = [u.rollD10(),u.rollD10()];
         
         let match_text = "";
         
@@ -395,6 +385,8 @@ class BasicMove extends Move {
         return this;
     }
 }
+
+/* FATE MOVES */
 
 class AskTheOracleMove extends Move {
     constructor(odds = "Likely") {
@@ -442,8 +434,8 @@ class AskTheOracleMove extends Move {
     }
         
     execute() {
-        let oracle_die = rollD100();
-        let oracle_die_array = numberToArray(oracle_die);
+        let oracle_die = u.rollD100();
+        let oracle_die_array = u.numberToArray(oracle_die);
         if (oracle_die_array[0] == oracle_die_array[1]) {
             this.match = true;
         }
@@ -482,6 +474,8 @@ class PayThePriceMove extends Move {
         return this;
     }
 }
+
+/* ADVENTURE MOVES */
 
 class FaceDangerMove extends BasicMove {
     constructor() {
@@ -637,20 +631,180 @@ class ReachYourDestination extends BasicMove  {
     }
 }
 
-var IS = {
-    "AskTheOracleMove": AskTheOracleMove,
-    "FaceDangerMove": FaceDangerMove,
-    "GatherInformation": GatherInformation,
-    "Heal": Heal,
-    "MakeCamp": MakeCamp,
-    "PayThePriceMove": PayThePriceMove,
-    "ReachYourDestination": ReachYourDestination,
-    "Resupply": Resupply,
-    "SecureAnAdvantage": SecureAnAdvantage,
-    "UndertakeAJourney": UndertakeAJourney,
-    "PayThePriceTable": PayThePriceTable,
-    "OracleAction": OracleAction,
-    "OracleTheme": OracleTheme,
-    "OraclePlotTwist": OraclePlotTwist,    
-    "OracleActionTheme": OracleActionTheme
+/* RELATIONSHIP MOVES */
+
+class Compel extends BasicMove  {
+    constructor() {
+        super();
+        this.title = "Compel";    
+        this.trigger = "When you attempt to persuade someone to do something, envision your approach and roll. If you";
+        this.use_bond = true;
+        this._do_this = [
+            "• Charm, pacify, barter, or convince: Roll +heart (add +1 if you share a bond).",
+            "• Threaten or incite: Roll +iron.",
+            "• Lie or swindle: Roll +shadow"
+        ].join("\n");
+        this.applicable_stats = ["Heart", "Iron", "Shadow"];
+        this.strong_hit = "On a strong hit, they’ll do what you want or share what they know. Take +1 momentum. If you use this exchange to Gather Information, make that move now and add +1.";
+        this.weak_hit = "On a weak hit, as above, but they ask something of you in return. Envision what they want (Ask the Oracle if unsure).";
+        this.miss = "On a miss, they refuse or make a demand which costs you greatly. Pay the Price.";
+    }
 }
+
+class Sojourn extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class DrawTheCircle extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class ForgeABond extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class TestYourBond extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class AidYourAlly extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class WriteYourEpilogue extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+/* COMBAT MOVES */
+
+class Strike extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class Clash extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class TurnTheTide extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class EnterTheFray extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class EndTheFight extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class Battle extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+/* SUFFER MOVES */
+
+class EndureHarm extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class FaceDeath extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class CompanionEndureHarm extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class EndureStress extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class FaceDesolation extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class OutOfSupply extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+class FaceASetback extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+/* QUEST MOVES */
+
+class SwearAnIronVow extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+class ReachAMilestone extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+class FulfillYourVow extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+class ForsakeYourVow extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+class Advance extends BasicMove {
+    constructor() {
+        super();
+    }
+}
+
+export { 
+    Utils,IS,
+    Advance,AidYourAlly,AskTheOracleMove,
+    Battle,Clash,CompanionEndureHarm,Compel,
+    DrawTheCircle,EndTheFight,EndureHarm,EndureStress,EnterTheFray,
+    FaceASetback,FaceDangerMove,FaceDeath,FaceDesolation,ForgeABond,
+    ForsakeYourVow,FulfillYourVow,GatherInformation,Heal,MakeCamp,
+    OutOfSupply,PayThePriceMove,ReachAMilestone,ReachYourDestination,
+    Resupply,SecureAnAdvantage,Sojourn,Strike,SwearAnIronVow,TestYourBond,
+    TurnTheTide,UndertakeAJourney,WriteYourEpilogue,
+    OracleAction,OracleActionTheme,OraclePlotTwist,OracleTheme,PayThePriceTable }

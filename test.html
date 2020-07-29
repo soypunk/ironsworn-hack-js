@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
   <meta charset="utf-8">
   <title>IS Testing</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
-  <script type="text/javascript" src='./ironsworn-hack.js'></script>
+  <!-- <script type="text/javascript" src=''></script> -->
   <body class="sans-serif pa2 bg-black gray">    
 
     <section class="ba pa3 mb3">
@@ -33,7 +33,11 @@
 
     
   </body>
-  <script type="text/javascript">
+  <script type="module">
+    import * as myIS from "./ironsworn-hack.js";
+    const lIS = new myIS.IS();
+    console.log(lIS.MOVES);
+
     function ready(fn) {
       if (document.readyState != 'loading'){
         fn()
@@ -43,23 +47,22 @@
     }
 
     ready(function(){
-    
       // MOVES
       let getMoveResult = function(move) {
-            $moveResult = document.getElementById("moveResult");
+            let $moveResult = document.getElementById("moveResult");
             $moveResult.innerHTML = "";
             move.execute();
             $moveResult.innerHTML = move.resultTextHTML;
       }
     
       let updateMoveBox = function(moveClass) {
-            $moveResult = document.getElementById("moveResult");
+            let $moveResult = document.getElementById("moveResult");
             $moveResult.innerHTML = "";      
-            var move = new IS[moveClass]();
-            $moveTitle = document.getElementById("moveTitle");
-            $moveTrigger = document.getElementById("moveTrigger");
-            $moveDoThis = document.getElementById("moveDoThis");            
-            $moveGoButton = document.getElementById("moveGoButton");
+            let move = new myIS[moveClass]();
+            let $moveTitle = document.getElementById("moveTitle");
+            let $moveTrigger = document.getElementById("moveTrigger");
+            let $moveDoThis = document.getElementById("moveDoThis");            
+            let $moveGoButton = document.getElementById("moveGoButton");
             $moveGoButton.classList.remove("dn");
             
             $moveTitle.textContent = move.title;
@@ -71,10 +74,10 @@
             });
       }
     
-      $moves = document.getElementById("moves");
+      let $moves = document.getElementById("moves");
       let moveFragment = document.createDocumentFragment();
 
-      MOVES.forEach(function(move, index) {
+      lIS.MOVES.forEach(function(move, index) {
           let opt = document.createElement('option');
           opt.innerHTML = move;
           opt.value = move;
@@ -91,21 +94,21 @@
       // ORACLES      
 
       let updateOracleBox = function(oracleClass) {
-            $oracleResult = document.getElementById("oracleResult");      
+            let $oracleResult = document.getElementById("oracleResult");      
             $oracleResult.textContent = "";      
-            var oracle = new IS[oracleClass]();
-            $oracleTitle = document.getElementById("oracleTitle");
-            $oracleTableDisplay = document.getElementById("oracleTableDisplay");
+            let oracle = new myIS[oracleClass]();
+            let $oracleTitle = document.getElementById("oracleTitle");
+            let $oracleTableDisplay = document.getElementById("oracleTableDisplay");
             $oracleTitle.textContent = oracle.title;
             $oracleTableDisplay.textContent = oracle.tableDisplay();            
             oracle.execute();
             $oracleResult.textContent = oracle.result;
       }
 
-      $oracles = document.getElementById("oracles");
+      let $oracles = document.getElementById("oracles");
       let oracleFragment = document.createDocumentFragment();
 
-      ORACLES.forEach(function(oracle, index) {
+      lIS.ORACLES.forEach(function(oracle, index) {
           let opt = document.createElement('option');
           opt.innerHTML = oracle;
           opt.value = oracle;
